@@ -1,10 +1,14 @@
-import React, { FC } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useRouter } from 'next/router'
 import { Button, Card, Container, Grid, Image, Text } from '@nextui-org/react';
 import { Layout } from '../../components/layout'
 import { Pokemon } from '../../interfaces';
 import pokeapi from '../../api/pokeApi';
+import { getinfo, util } from '../../utils';
+import confetti from 'canvas-confetti';
+// import { Pokemon } from '../../interfaces/pokemon-full';
+// import { getPokemonInfo } from '../../utils/getPokemonInfo';
 
 
 
@@ -15,16 +19,54 @@ interface Props{
 const PokemonPage: FC<Props> = ({ pokemon }) => {
 
   const { name, id} = pokemon;
+  
+  const [isFavorites, setIsFavorites] = useState( false )
+
+     useEffect(()=>{
+        setIsFavorites( util.existInFavorites(pokemon.id) )
+     },[pokemon.id])
 
     const router = useRouter();
-    console.log(router.query)
+    const volver = ()=>{ router.back();}
 
-    const volver = ()=>{
-      router.back();
-    }
+    const onToggleFavirite = ( )=>{   
+    util.toggleFavorite( id )
+    setIsFavorites(!isFavorites)
+
+    if( isFavorites ) return;
+
+    var end = Date.now() + (1 * 1000);
+    var colors = ['#bb0000', '#ffffff'];
+    var end = Date.now() + (1 * 1000);
+
+    // go Buckeyes!
+    var colors = ['#bb0000', '#ffffff'];
+    
+    (function frame() {
+      confetti({
+        particleCount: 2,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: colors
+      });
+      confetti({
+        particleCount: 2,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: colors
+      });
+    
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    }());
+
+  }
 
   return (
-    <Layout title='Algun pokemon'>
+    <Layout title={ `${pokemon.name}`}>
         <Grid.Container css={{ marginTop:'5px'}} gap={ 2 }>
           <Grid xs={ 12 } sm={ 4 }>
             <Card hoverable css={{ padding: '30px'}}>
@@ -45,9 +87,10 @@ const PokemonPage: FC<Props> = ({ pokemon }) => {
                 <Text h1 transform='capitalize'> {  pokemon.name }</Text>
                 <Button
                   color="gradient"
-                  ghost
+                  ghost={ !isFavorites }
+                  onClick={ onToggleFavirite }
                 >
-                  Guardar en favoritos
+                  { isFavorites ? 'En favoritos' : 'Guardar en favoritos' }
                 </Button>
               </Card.Header>
               <Card.Body>
@@ -84,6 +127,14 @@ const PokemonPage: FC<Props> = ({ pokemon }) => {
           </Grid>
 
         </Grid.Container>
+
+        <Button
+          color='gradient'
+          ghost
+          onClick={ volver }
+        >
+          Back 
+        </Button>
     
     </Layout>
   )
@@ -112,14 +163,11 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   
 
-  const { id } = params as { id: string}
-
-  const  { data } = await pokeapi.get<Pokemon>(`/pokemon/${ id }`);
-    
+   const { id } = params as { id: string}
 
   return {
     props: {
-        pokemon: data
+        pokemon : await getinfo.getPokemonInfo(id)
     }
   }
 }

@@ -1,18 +1,18 @@
 import { NextPage ,GetStaticProps} from 'next'
 import { Button, Card, Grid, Row, Text } from '@nextui-org/react'
+
+import confetti from 'canvas-confetti'
+
 import pokeapi from '../api/pokeApi'
 import { Layout } from '../components/layout'
 import { PokemonListResponse, SmallPokemon } from '../interfaces'
 import { PokemonCard } from '../components/pokemon';
-
 
 interface Props{
   pokemons: SmallPokemon[]
 }
 
 const HomePage: NextPage<Props> = ( { pokemons } ) => {
-  
-  
   
   return (
     <>

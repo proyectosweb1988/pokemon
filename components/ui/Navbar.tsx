@@ -1,11 +1,38 @@
-import { Button, Link, Spacer, Text, useTheme } from '@nextui-org/react'
+import React, { ChangeEvent, useState} from 'react'
+import { Button, FormElement, Input, Link, Spacer, Text, useTheme } from '@nextui-org/react'
 import Image from 'next/image';
 import NextLink from 'next/link';
-import React from 'react'
+import { useRouter } from 'next/router';
+
 
 export const Navbar = () => {
 
     const { theme } = useTheme();
+
+    const router = useRouter();
+
+    const [pokemon, setPokemon] = useState({
+      name: ''
+    })
+
+    const { name} = pokemon;
+ 
+
+    const buscarPokemon = ()=>{
+      if(name.length === 0){
+        return
+      }
+
+      router.push(`/name/${ name }`)
+
+    }
+
+    const pokemonChange = (e: ChangeEvent<FormElement>)=>{
+
+
+        setPokemon( { name: e.target.value})
+        console.log(pokemon)
+    }
 
   return (
     <div
@@ -32,18 +59,48 @@ export const Navbar = () => {
           <Text color='white' h3 >okemon BETA</Text>
         </Link>
       </NextLink>
-      
-      
-
-      <Spacer css={{ flex: 1}}/>
-
+      <Spacer/>
       <NextLink href='/favoritos' passHref>
         <Link>
           <text color='white'> Favoritos</text>
         </Link>
       </NextLink>
+      
+      
 
+      <Spacer css={{ flex: 1}}/>
 
+     
+      {/* <Button
+          onClick={buscarPokemon} 
+      >
+        Buscar
+      </Button>
+      <input
+        
+          placeholder="pokemon" 
+          color='primary'
+          name='name'
+          value={name}
+          // onChange={ pokemonChange }
+          onChange={ pokemonChange }
+       
+
+        /> */}
+          <Input
+          
+          labelLeft='Buscar'
+          underlined
+          placeholder="pokemon" 
+          color='primary'
+          name='name'
+          value={name}
+          // onChange={ pokemonChange }
+          onChange={ pokemonChange }
+          onClick={ buscarPokemon }
+     
+
+      />
      
 
     </div>
